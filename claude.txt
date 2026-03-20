@@ -71,203 +71,276 @@
 </script>
 <style>
 /* ============================================================
-   DR.SHROOMS — UI ENHANCEMENT LAYER
-   Visual polish: glows, shimmer, elevation, masks, typography
+   DR.SHROOMS — PREMIUM ENHANCEMENT LAYER v2
+   Performance, grain texture, refined palette, typography
    ============================================================ */
 
-/* ── Primary CTA pulse (forest portal button) ─────────────── */
-@keyframes portalGlow {
-  0%, 100% { box-shadow: 0 4px 24px rgba(45,90,39,.3), 0 0 0 0 rgba(45,90,39,.4); }
-  50%       { box-shadow: 0 8px 40px rgba(45,90,39,.55), 0 0 0 10px rgba(45,90,39,0); }
-}
-.portal-forest {
-  animation: portalGlow 3s ease-in-out infinite;
-}
-.portal-forest:hover {
-  animation: none;
-  transform: translateY(-4px);
-  box-shadow: 0 12px 48px rgba(45,90,39,.55);
-}
-
-/* ── Shimmer border on all portal buttons ─────────────────── */
-@keyframes shimmerBorder {
-  0%   { background-position: -200% center; }
-  100% { background-position:  200% center; }
-}
-.portal-btn {
-  position: relative;
-  transition: transform .35s cubic-bezier(.16,1,.3,1), box-shadow .35s;
-}
-.portal-btn::after {
+/* ── PERFORMANCE: kill full-page background repaint ─────────
+   parchBreath animates background-color on <body> → full repaint
+   every frame. Override to none; composited opacity on ::before ─ */
+body { animation: none !important; }
+body::before {
   content: '';
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  background: linear-gradient(
-    115deg,
-    transparent 20%,
-    rgba(255,255,255,.25) 50%,
-    transparent 80%
-  );
-  background-size: 200% 100%;
-  opacity: 0;
-  transition: opacity .3s;
+  position: fixed; inset: 0;
+  background: var(--parch);
+  z-index: -2;
   pointer-events: none;
-  z-index: 2;
-}
-.portal-btn:hover::after {
-  opacity: 1;
-  animation: shimmerBorder .7s linear;
 }
 
-/* ── Promo ticker — gradient edge masks ───────────────────── */
-.promo-ticker {
-  -webkit-mask-image: linear-gradient(
-    to right,
-    transparent 0%,
-    black 5%,
-    black 95%,
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    to right,
-    transparent 0%,
-    black 5%,
-    black 95%,
-    transparent 100%
-  );
+/* ── GRAIN/NOISE TEXTURE — artisanal premium feel ───────────
+   SVG feTurbulence grain overlay — zero network requests,
+   composited on GPU, opacity .032 is almost invisible but
+   transforms the "screen" feel into something tactile ─────── */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  opacity: .032;
+  pointer-events: none;
+  z-index: 9000;
 }
 
-/* ── Catalogue cards — elevated hover, green accent bar ───── */
-.cat-card {
-  border-top: 2px solid transparent;
-  transition: background .25s, box-shadow .3s, border-color .3s, transform .3s cubic-bezier(.16,1,.3,1);
+/* ── PORTAL BUTTONS — refined, no emoji clutter ─────────────
+   Emojis read as playful/cheap. Replace with minimal typographic
+   flow. Tighten geometry. Add refined inset highlight line. ── */
+.portal-btn-icon { display: none; }
+
+.portal-btn {
+  letter-spacing: .32em;
+  font-size: .68rem;
+  padding: 1.2rem 3rem;
+  border-radius: 0;
+  border-top: 1px solid rgba(255,255,255,.18);
+  position: relative;
+  transition: transform .4s cubic-bezier(.16,1,.3,1),
+              box-shadow .4s,
+              letter-spacing .3s;
 }
-.cat-card:hover {
-  background: rgba(226,219,184,1);
-  box-shadow: 0 8px 32px rgba(45,90,39,.18), 0 2px 8px rgba(45,90,39,.1);
-  border-top-color: #2d5a27;
+.portal-btn:hover {
+  letter-spacing: .38em;
   transform: translateY(-3px);
 }
 
-/* ── Forest product rows — hover highlight ────────────────── */
+/* Primary CTA — refined pulse (opacity, not box-shadow size) */
+@keyframes refinedPulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: .88; }
+}
+.portal-forest {
+  animation: refinedPulse 4s ease-in-out infinite;
+  box-shadow: 0 4px 28px rgba(45,90,39,.35);
+}
+.portal-forest:hover {
+  animation: none;
+  opacity: 1;
+  box-shadow: 0 10px 44px rgba(45,90,39,.5);
+}
+
+/* Shimmer sweep — only on interaction, not constant */
+.portal-btn::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 30%,
+    rgba(255,255,255,.18) 50%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  opacity: 0;
+  transition: opacity .25s;
+  pointer-events: none;
+}
+.portal-btn:hover::after {
+  opacity: 1;
+  animation: shimmer .5s linear;
+}
+@keyframes shimmer {
+  from { background-position: -100% 0; }
+  to   { background-position:  200% 0; }
+}
+
+/* ── GOLD TEXT — refined, slower, quieter ───────────────────
+   8-stop gradient with drop-shadow felt garish.
+   Simplify to 4 stops, 12s cycle, remove excessive filter. ─ */
+.gold-text {
+  background: linear-gradient(
+    135deg,
+    #c8922a 0%,
+    #f0d060 40%,
+    #c8922a 60%,
+    #e8b840 100%
+  ) !important;
+  background-size: 250% 250% !important;
+  animation: goldShimmerRefined 12s ease-in-out infinite !important;
+  filter: none !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+@keyframes goldShimmerRefined {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
+}
+
+/* ── PROMO TICKER — quieter, less saturated ─────────────────
+   Tone down from full forest-green to a more restrained tone. ─ */
+.promo-ticker {
+  background: rgba(40,70,28,.92) !important;
+  backdrop-filter: blur(4px);
+  border-bottom: 1px solid rgba(255,255,255,.07) !important;
+  -webkit-mask-image: linear-gradient(
+    to right, transparent 0%, black 6%, black 94%, transparent 100%);
+  mask-image: linear-gradient(
+    to right, transparent 0%, black 6%, black 94%, transparent 100%);
+}
+.promo-ticker-item {
+  letter-spacing: .22em;
+  font-size: .65rem;
+  opacity: .85;
+}
+
+/* ── NAVIGATION — more architectural ───────────────────────── */
+.land-nav {
+  border-bottom: 1px solid rgba(74,66,50,.08) !important;
+  box-shadow: 0 1px 0 rgba(74,66,50,.06), 0 2px 16px rgba(0,0,0,.04) !important;
+}
+.land-nav-brand {
+  letter-spacing: .5em;
+  font-size: .68rem;
+}
+
+/* ── CATALOGUE CARDS — elevated, editorial ─────────────────── */
+.cat-card {
+  border-top: 2px solid transparent;
+  transition: background .25s, box-shadow .35s, border-color .3s,
+              transform .35s cubic-bezier(.16,1,.3,1);
+}
+.cat-card:hover {
+  background: rgba(226,219,184,1);
+  box-shadow: 0 12px 40px rgba(45,90,39,.15), 0 2px 8px rgba(0,0,0,.06);
+  border-top-color: #2d5a27;
+  transform: translateY(-4px);
+}
+
+/* ── FOREST CARDS — stronger contrast in dark mode ─────────── */
+.cat-card .cat-name { font-size: 1.2rem; letter-spacing: -.015em; }
+.cat-card .cat-desc { line-height: 1.85; color: #4a4030; }
+
+/* ── PRICING ROWS ─────────────────────────────────────────── */
 .prow {
   transition: background .2s, padding-left .2s;
+  border-bottom: 1px solid rgba(74,66,50,.08) !important;
 }
 .prow:hover {
-  background: rgba(90,168,50,.08);
+  background: rgba(90,168,50,.07);
   padding-left: .6rem;
 }
 
-/* ── Review cards — star glow ─────────────────────────────── */
+/* ── REVIEW CARDS ─────────────────────────────────────────── */
 .review-stars {
-  filter: drop-shadow(0 1px 4px rgba(232,192,64,.5));
-  letter-spacing: .12em;
+  letter-spacing: .15em;
+  color: #d4a030;
+  opacity: .9;
 }
 .review-card {
-  transition: background .25s, transform .3s cubic-bezier(.16,1,.3,1);
+  transition: background .25s, transform .35s cubic-bezier(.16,1,.3,1);
 }
-.review-card:hover {
-  transform: translateY(-2px);
-}
+.review-card:hover { transform: translateY(-2px); }
 
-/* ── Wholesale why cards — top shimmer line ───────────────── */
-.ws-why-card:hover::before {
-  background: linear-gradient(90deg, transparent, rgba(45,90,39,.55), transparent);
-}
-
-/* ── Clearing (forest category grid) — glow border on hover ── */
-.clearing:hover {
-  box-shadow: 0 0 0 1px rgba(90,168,50,.35), inset 0 0 20px rgba(90,168,50,.04);
-}
-
-/* ── Forest hero title — subtle text shadow depth ─────────── */
-.forest-hero-title {
-  text-shadow:
-    0 2px 24px rgba(5,12,4,.6),
-    0 1px 4px rgba(5,12,4,.5),
-    0 8px 40px rgba(232,192,64,.08);
-}
-
-/* ── Section h2 — em highlight underline ─────────────────── */
-.section-h2 em,
-.ws-section-h2 em,
-.land-about-h2 em {
+/* ── SECTION HEADINGS — refined underline on em ────────────── */
+.section-h2 em, .ws-section-h2 em, .land-about-h2 em,
+.ws-hero-title em, .ws-contact-title em {
   position: relative;
 }
-.section-h2 em::after,
-.ws-section-h2 em::after,
+.section-h2 em::after, .ws-section-h2 em::after,
 .land-about-h2 em::after {
   content: '';
-  position: absolute;
-  left: 0; right: 0;
-  bottom: -2px;
-  height: 2px;
-  background: linear-gradient(90deg, currentColor, transparent);
-  opacity: .35;
+  position: absolute; left: 0; right: 0; bottom: -3px;
+  height: 1px;
+  background: linear-gradient(90deg, currentColor 40%, transparent 100%);
+  opacity: .3;
 }
 
-/* ── Forest spec items — hover scale ─────────────────────── */
-.spec-item {
-  transition: background .25s, transform .25s cubic-bezier(.16,1,.3,1);
-}
-.spec-item:hover {
-  transform: translateY(-2px);
+/* ── FOREST HERO TITLE — layered depth ─────────────────────── */
+.forest-hero-title {
+  text-shadow:
+    0 2px 20px rgba(5,12,4,.65),
+    0 1px 4px rgba(5,12,4,.5),
+    0 8px 48px rgba(232,192,64,.1);
 }
 
-/* ── Guide steps — accent line pulse ─────────────────────── */
+/* ── CLEARING GRID (forest entry) — glow on hover ─────────── */
+.clearing:hover {
+  box-shadow: 0 0 0 1px rgba(90,168,50,.4),
+              inset 0 0 24px rgba(90,168,50,.05);
+}
+
+/* ── GUIDE STEPS — accent line breath ──────────────────────── */
 @keyframes stemPulse {
-  0%, 100% { opacity: .5; }
-  50%       { opacity: .9; }
+  0%, 100% { opacity: .45; }
+  50%       { opacity: .85; }
 }
-.guide-step::before {
-  animation: stemPulse 3s ease-in-out infinite;
-}
+.guide-step::before { animation: stemPulse 4s ease-in-out infinite; }
 
-/* ── Scroll indicator — smoother stem ────────────────────── */
-.land-scroll-line {
-  background: linear-gradient(to bottom, rgba(45,90,39,.7), transparent);
+/* ── WHOLESALE CARDS ─────────────────────────────────────────*/
+.ws-why-card:hover::before {
+  background: linear-gradient(90deg, transparent, rgba(45,90,39,.5), transparent);
 }
-
-/* ── Focus visible — polished keyboard nav ───────────────── */
-:focus-visible {
-  outline: 2px solid rgba(45,90,39,.7);
-  outline-offset: 3px;
-  border-radius: 2px;
-}
-button:focus-visible,
-a:focus-visible {
-  outline: 2px solid #2d5a27;
-  outline-offset: 3px;
-}
-
-/* ── Wholesale offer card accent bar — animated width ─────── */
 .ws-offer-card::after {
-  transition: height .4s cubic-bezier(.16,1,.3,1), opacity .3s;
+  transition: height .45s cubic-bezier(.16,1,.3,1), opacity .3s;
 }
-.ws-offer-card:hover::after {
-  height: 100%;
-  opacity: .25;
-}
+.ws-offer-card:hover::after { height: 100%; opacity: .2; }
 
-/* ── Modal enquire button — ripple on hover ───────────────── */
+/* ── MODAL ENQUIRE BUTTON ─────────────────────────────────── */
 .modal-enquire-btn {
-  overflow: hidden;
-  position: relative;
+  overflow: hidden; position: relative;
+  letter-spacing: .1em;
 }
 .modal-enquire-btn::after {
   content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(255,255,255,.12);
+  position: absolute; inset: 0;
+  background: rgba(255,255,255,.1);
   transform: translateX(-100%);
   transition: transform .35s cubic-bezier(.16,1,.3,1);
 }
-.modal-enquire-btn:hover::after {
-  transform: translateX(0);
+.modal-enquire-btn:hover::after { transform: translateX(0); }
+
+/* ── SPEC ITEMS (pricing grid) ──────────────────────────────── */
+.spec-item {
+  transition: background .25s, transform .3s cubic-bezier(.16,1,.3,1);
+}
+.spec-item:hover { transform: translateY(-2px); }
+
+/* ── SCROLL INDICATOR ─────────────────────────────────────── */
+.land-scroll-line {
+  background: linear-gradient(to bottom, rgba(45,90,39,.65), transparent);
+}
+
+/* ── FOCUS STATES (accessibility + design quality) ──────────── */
+:focus-visible {
+  outline: 1.5px solid rgba(45,90,39,.65);
+  outline-offset: 3px;
+}
+button:focus-visible, a:focus-visible {
+  outline: 1.5px solid #2d5a27;
+  outline-offset: 3px;
 }
 </style>
-</head><body><noscript><style>.land-nav-links{display:flex !important;position:static !important;background:none !important;flex-direction:row !important;}.land-nav-hamburger{display:none !important;}#forestSite,#wholesaleSite,#landOverlay,#forestOverlay{display:none !important;}</style></noscript><div id="cur"></div><div id="cur-trail"></div><div id="cur-spore"></div><canvas id="bgCanvas"></canvas><nav class="land-nav" id="landNav"><a class="land-nav-brand" href="#">DR.SHROOMS</a><a class="land-nav-email" href="/cdn-cgi/l/email-protection#573e3931381733257a243f2538383a79343879223c"><span class="__cf_email__" data-cfemail="442d2a222b04203669372c362b2b296a272b6a312f">[email&#160;protected]</span></a><ul class="land-nav-links" id="landNavLinks"><li><a href="#landAbout">About</a></li><li><a href="#" onclick="openWholesale();return false;">Stock Our Products</a></li><li><a href="https://dr-shrooms-2.myshopify.com/" target="_blank" rel="noopener noreferrer">The Shop</a></li><li><a href="#" onclick="openLandPricing();return false;">The Price List</a></li><li><a href="https://www.instagram.com/drshrooms11/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" style="display:inline-flex;align-items:center;color:var(--olive);transition:color .3s;" class="land-nav-ig-link"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a></li></ul><button class="land-nav-hamburger" id="landHam" aria-label="Menu"><span></span><span></span><span></span></button></nav><style>.promo-ticker{position:fixed;top:var(--nav-ticker-top,61px);left:0;right:0;z-index:799;background:var(--forest-green);overflow:hidden;height:44px;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.12);}.promo-ticker-track{display:flex;align-items:center;white-space:nowrap;animation:ticker-scroll 60s linear infinite;will-change:transform;}.promo-ticker-track:hover{animation-play-state:paused;}.promo-ticker-item{display:inline-flex;align-items:center;gap:.6rem;font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:#fff;padding:0 2.8rem;font-weight:500;}.promo-ticker-item a{color:#fff;text-decoration:underline;text-underline-offset:3px;opacity:.85;transition:opacity .2s;}.promo-ticker-item a:hover{opacity:1;}.promo-ticker-dot{display:inline-block;width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.5);flex-shrink:0;}@keyframes ticker-scroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}@media(max-width:900px){.promo-ticker{top:61px;}.promo-ticker-item{font-size:.55rem;letter-spacing:.12em;padding:0 2rem;}}
+</head><body>
+<!-- Performance: throttle bgCanvas when idle, pause when tab hidden -->
+<script>
+(function(){
+  document.addEventListener('visibilitychange',function(){ window._tabHidden=document.hidden; });
+  var _lastMove=Date.now();
+  document.addEventListener('mousemove',function(){ _lastMove=Date.now(); },{passive:true});
+  document.addEventListener('touchmove', function(){ _lastMove=Date.now(); },{passive:true});
+  window._canvasIdle=function(){ return window._tabHidden||(Date.now()-_lastMove>2000); };
+})();
+</script>
+<noscript><style>.land-nav-links{display:flex !important;position:static !important;background:none !important;flex-direction:row !important;}.land-nav-hamburger{display:none !important;}#forestSite,#wholesaleSite,#landOverlay,#forestOverlay{display:none !important;}</style></noscript><div id="cur"></div><div id="cur-trail"></div><div id="cur-spore"></div><canvas id="bgCanvas"></canvas><nav class="land-nav" id="landNav"><a class="land-nav-brand" href="#">DR.SHROOMS</a><a class="land-nav-email" href="/cdn-cgi/l/email-protection#573e3931381733257a243f2538383a79343879223c"><span class="__cf_email__" data-cfemail="442d2a222b04203669372c362b2b296a272b6a312f">[email&#160;protected]</span></a><ul class="land-nav-links" id="landNavLinks"><li><a href="#landAbout">About</a></li><li><a href="#" onclick="openWholesale();return false;">Stock Our Products</a></li><li><a href="https://dr-shrooms-2.myshopify.com/" target="_blank" rel="noopener noreferrer">The Shop</a></li><li><a href="#" onclick="openLandPricing();return false;">The Price List</a></li><li><a href="https://www.instagram.com/drshrooms11/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" style="display:inline-flex;align-items:center;color:var(--olive);transition:color .3s;" class="land-nav-ig-link"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a></li></ul><button class="land-nav-hamburger" id="landHam" aria-label="Menu"><span></span><span></span><span></span></button></nav><style>.promo-ticker{position:fixed;top:var(--nav-ticker-top,61px);left:0;right:0;z-index:799;background:var(--forest-green);overflow:hidden;height:44px;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.12);}.promo-ticker-track{display:flex;align-items:center;white-space:nowrap;animation:ticker-scroll 60s linear infinite;will-change:transform;}.promo-ticker-track:hover{animation-play-state:paused;}.promo-ticker-item{display:inline-flex;align-items:center;gap:.6rem;font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:#fff;padding:0 2.8rem;font-weight:500;}.promo-ticker-item a{color:#fff;text-decoration:underline;text-underline-offset:3px;opacity:.85;transition:opacity .2s;}.promo-ticker-item a:hover{opacity:1;}.promo-ticker-dot{display:inline-block;width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.5);flex-shrink:0;}@keyframes ticker-scroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}@media(max-width:900px){.promo-ticker{top:61px;}.promo-ticker-item{font-size:.55rem;letter-spacing:.12em;padding:0 2rem;}}
 .gold-text{background:linear-gradient(135deg,#bf8a1e 0%,#f7e580 18%,#d4a030 32%,#fff6d1 48%,#c8922a 58%,#f5d96a 72%,#a67c1a 85%,#f7e580 100%);background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:goldShimmer 5s ease-in-out infinite;filter:drop-shadow(0 1px 4px rgba(164,124,26,.5)) drop-shadow(0 0 12px rgba(212,160,48,.2));}
 @keyframes goldShimmer{0%{background-position:0% 50%;}33%{background-position:100% 50%;}66%{background-position:50% 100%;}100%{background-position:0% 50%;}}
 </style><div class="promo-ticker" id="promoTicker"><div class="promo-ticker-track" id="promoTrack"><span class="promo-ticker-item"><span class="promo-ticker-dot"></span> 🍄 Any 5 Products for the Price of 4 — <a href="https://dr-shrooms-2.myshopify.com/" target="_blank" rel="noopener noreferrer">Shop Now</a></span><span class="promo-ticker-item"><span class="promo-ticker-dot"></span> ✦ Subscribe &amp; Save — Recurring Orders, Zero Hassle </span><span class="promo-ticker-item"><span class="promo-ticker-dot"></span> 🌿 Product of the Month — Lion's Mane &amp; Reishi Bundle — <a href="https://dr-shrooms-2.myshopify.com/" target="_blank" rel="noopener noreferrer">Explore</a></span><span class="promo-ticker-item"><span class="promo-ticker-dot"></span> ⚡ Bundle &amp; Stack — Curated Protocols for Maximum Benefit </span><span class="promo-ticker-item"><span class="promo-ticker-dot"></span> 🍄 Any 5 Products for the Price of 4 — <a href="https://dr-shrooms-2.myshopify.com/" target="_blank" rel="noopener noreferrer">Shop Now</a></span><span class="promo-ticker-item"><span class="promo-ticker-dot"></span> ✦ Free UK Delivery on Orders Over £60 </span><span class="promo-ticker-item"><span class="promo-ticker-dot"></span> 🍄 Any 5 Products for the Price of 4 — <a href="https://dr-shrooms-2.myshopify.com/" target="_blank" rel="noopener noreferrer">Shop Now</a></span><span class="promo-ticker-item"><span class="promo-ticker-dot"></span> ✦ Subscribe &amp; Save — Recurring Orders, Zero Hassle </span><span class="promo-ticker-item"><span class="promo-ticker-dot"></span> 🌿 Product of the Month — Lion's Mane &amp; Reishi Bundle — <a href="https://dr-shrooms-2.myshopify.com/" target="_blank" rel="noopener noreferrer">Explore</a></span><span class="promo-ticker-item"><span class="promo-ticker-dot"></span> ⚡ Bundle &amp; Stack — Curated Protocols for Maximum Benefit </span><span class="promo-ticker-item"><span class="promo-ticker-dot"></span> 🍄 Any 5 Products for the Price of 4 — <a href="https://dr-shrooms-2.myshopify.com/" target="_blank" rel="noopener noreferrer">Shop Now</a></span><span class="promo-ticker-item"><span class="promo-ticker-dot"></span> ✦ Free UK Delivery on Orders Over £60 </span></div></div><script> // Dynamically measure nav height to position ticker correctly (function(){ function setTickerTop(){ var nav = document.getElementById('landNav'); if(nav){ document.getElementById('promoTicker').style.top = nav.offsetHeight + 'px'; } } setTickerTop(); window.addEventListener('resize', setTickerTop); // Also nudge hero padding so content isn't hidden under nav+ticker document.addEventListener('DOMContentLoaded', function(){ setTickerTop(); }); })(); </script><section style="position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8rem 2rem 4rem;text-align:center;background-image:linear-gradient(180deg, rgba(0,0,0,.25) 0%, rgba(0,0,0,.35) 40%, rgba(0,0,0,.6) 100%), url(https://image2url.com/r2/default/images/1773949133893-9dd3d0b8-c955-457e-9f99-dace33c99df1.jpeg);background-size:cover;background-position:center;background-repeat:no-repeat;"><img src="https://image2url.com/r2/default/images/1774021480433-005a1fbb-5a30-4b59-9e13-1f24d53b7d23.png" alt="Dr.Shrooms Logo" style="height:180px;width:auto;margin-bottom:1.5rem;filter:drop-shadow(0 4px 20px rgba(0,0,0,.5));"><h1 class="land-tagline gold-text" style="text-align:center;font-size:clamp(1.1rem,2.2vw,1.6rem);margin:0 auto 0;font-weight:600;letter-spacing:.05em;max-width:520px;line-height:1.6;">Wild Harvested &amp; Organic Medicinal Mushroom &amp; Plant Extracts</h1><div class="land-portals" style="justify-content:center;gap:1rem;margin-bottom:1.2rem;"><button class="portal-btn portal-forest" onclick="openForest()"><span class="portal-btn-icon">🍄</span><span>Step into the Forest</span></button><button class="portal-btn portal-wholesale" onclick="openWholesale()"><span class="portal-btn-icon">🌿</span><span>Stock Our Products</span></button><a class="portal-btn portal-shop" href="https://dr-shrooms-2.myshopify.com/" target="_blank" rel="noopener noreferrer"><span class="portal-btn-icon">🛒</span><span>Visit the Shop</span></a></div><div style="display:flex;flex-direction:column;align-items:center;gap:.5rem;padding:1rem 2rem;">
@@ -505,6 +578,8 @@ initNodes();
 let lastSpawn = 0;
 let lastMouseBurst = 0;
 function loop(t){
+  // Pause when tab hidden or canvas idle (throttle to ~30fps when mouse still)
+  if(window._tabHidden){ window._bgAnimFrame=requestAnimationFrame(loop); return; }
   // Pause canvas when forest or wholesale overlay is active — saves battery/CPU
   const fsActive = document.getElementById('forestSite') && document.getElementById('forestSite').classList.contains('show');
   const wsActive = document.getElementById('wholesaleSite') && document.getElementById('wholesaleSite').classList.contains('show');
@@ -512,6 +587,8 @@ function loop(t){
     window._bgAnimFrame=requestAnimationFrame(loop);
     return;
   }
+  // Frame-skip: when idle (no mouse >2s) draw at ~30fps instead of 60fps
+  if(window._canvasIdle && window._canvasIdle() && t % 2 < 1){ window._bgAnimFrame=requestAnimationFrame(loop); return; }
 
   ctx.clearRect(0,0,W,H);
 
